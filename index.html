@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A Sweet Message Just For You</title>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&family=Lora:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        /* Base styles */
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Lora', serif;
+            color: #333;
+
+            /* --- BACKGROUND IMAGE (bg.jpg) --- */
+            /* 🚨 IMPORTANT: Replace 'bg.jpg' with the correct path or a public URL! */
+            background-image: url('./images/love.jpg');
+            background-size: cover; 
+            background-position: center; 
+            background-repeat: no-repeat; 
+            
+            position: relative; /* Needed for the pseudo-element overlay */
+        }
+        
+        /* Pseudo-element for the overlay to control transparency of the background image */
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            /* Adjust alpha (0.2) for desired transparency. Lower is less transparent (more image visible) */
+            background-color: rgba(255, 255, 255, 0.2); 
+            z-index: -1; /* Place it behind the content but above the background image */
+        }
+
+        /* --- Envelope Structure --- */
+        .envelope {
+            position: relative;
+            width: 320px;
+            height: 220px;
+            background-color: #fce4ec; /* Default envelope color */
+            border-radius: 12px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            z-index: 10;
+            transition: transform 1s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+
+        .envelope-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: #fce4ec; /* Default back color, might be fully covered by image */
+            z-index: 1;
+            border-radius: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+        
+        /* --- SECRET IMAGE IN ENVELOPE SLIP (love.jpg) --- */
+        .envelope-back img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 12px;
+            opacity: 0; /* Hidden initially */
+            transition: opacity 0.5s;
+            box-shadow: none;
+        }
+
+        .envelope.open .envelope-back img {
+            opacity: 1; /* Visible when envelope is open */
+        }
+        
+        .envelope-flap {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            border-top: 110px solid #f8bbd0; /* Flap color */
+            border-right: 160px solid transparent;
+            border-left: 160px solid transparent;
+            transform-origin: top;
+            transition: transform 0.6s ease-in-out;
+            z-index: 3;
+        }
+
+        /* --- LETTER PAPER AESTHETICS --- */
+        .envelope-paper {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            transform: translateX(-50%) translateY(0) scale(0.8);
+            width: 95%; 
+            height: 400px; 
+            background-color: #fffaf0; /* Letter paper color */
+            border-radius: 8px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            border: 2px dashed #ffc0cb; 
+            z-index: 2;
+            transition: transform 1.2s cubic-bezier(0.68, -0.55, 0.265, 1.55), opacity 0.8s ease-in-out;
+            padding: 25px;
+            box-sizing: border-box;
+            max-height: 500px; 
+            overflow-y: auto;
+            opacity: 0; 
+        }
+
+        /* --- LETTER CONTENT AND ALIGNMENT --- */
+        .letter-content {
+            color: #555;
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            height: 100%;
+            text-align: center;
+        }
+        
+        .letter-content p {
+            margin-bottom: 1em;
+            font-size: 1.05em;
+            text-align: center;
+            padding: 0 5px;
+        }
+
+        .letter-image-container {
+            text-align: center;
+            margin: 15px auto;
+        }
+        /* --- IMAGE INSIDE LETTER (letter.jpg) --- */
+        .letter-image-container img {
+            max-width: 75%;
+            height: auto;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border: 3px solid #ffc0cb;
+        }
+
+        .heading {
+            font-family: 'Dancing Script', cursive;
+            font-size: 2.8em;
+            color: #e91e63;
+            margin-top: 0;
+            margin-bottom: 15px;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+        }
+
+        .signature {
+            margin-top: auto;
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.9em;
+            color: #d81b60;
+            font-weight: normal;
+            margin-bottom: 0;
+            padding-top: 10px;
+        }
+
+        /* --- Envelope Open States --- */
+        .envelope.open .envelope-flap {
+            transform: rotateX(180deg);
+        }
+
+        .envelope.open .envelope-paper {
+            transform: translateX(-50%) translateY(-350px) scale(1); 
+            opacity: 1;
+            z-index: 15;
+            animation: letterGlow 1.5s ease-out forwards; 
+        }
+
+        .envelope.open {
+            transform: translateY(120px);
+        }
+
+        @keyframes letterGlow {
+            0% { box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1); }
+            50% { box-shadow: 0 0 30px rgba(255, 192, 203, 0.7), 0 5px 20px rgba(0, 0, 0, 0.1); }
+            100% { box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1); }
+        }
+
+        /* --- Button Styling --- */
+        #open-btn {
+            position: absolute;
+            bottom: 20vh;
+            padding: 15px 30px;
+            font-size: 20px;
+            font-weight: 600;
+            cursor: pointer;
+            background-color: #e91e63;
+            color: white;
+            border: none;
+            border-radius: 40px;
+            box-shadow: 0 8px #c2185b;
+            transition: background-color 0.3s ease, transform 0.1s ease, box-shadow 0.1s ease, opacity 0.5s ease;
+            z-index: 11;
+            letter-spacing: 1px;
+        }
+
+        #open-btn:hover { background-color: #d81b60; }
+        #open-btn:active {
+            background-color: #c2185b;
+            box-shadow: 0 0 #c2185b;
+            transform: translateY(8px);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="envelope" id="envelope">
+        
+        <div class="envelope-back">
+            <img src="C:\Users\thoma\OneDrive\Desktop\documents\my_website\images\bg.jpg" alt="Secret image inside envelope" id="secret-image">
+        </div>
+        
+        <div class="envelope-flap"></div>
+        
+        <div class="envelope-paper">
+            <div class="letter-content">
+                
+                <h1 class="heading">Hi Chellow..,</h1>
+                
+                <p>Love you.. If you say yes come lets have baby... mwah.</p>
+                <p>Will Your Be My MR ???</p>
+
+                <div class="letter-image-container">
+                    <img src="C:\Users\thoma\OneDrive\Desktop\documents\my_website\images\letter.jpg" alt="Stitch and Angel kissing">
+                </div>
+                
+                <p>Thank you for being you, for your kindness, and for filling my life with so much beautiful magic. My heart belongs to you, always and forever.</p>
+
+                <p class="signature">With endless love,</p>
+                
+            </div>
+        </div>
+    </div>
+
+    <button id="open-btn">Open My Heart</button>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const openBtn = document.getElementById('open-btn');
+            const envelope = document.getElementById('envelope');
+
+            openBtn.addEventListener('click', () => {
+                envelope.classList.add('open');
+                
+                openBtn.style.opacity = '0';
+                openBtn.style.pointerEvents = 'none';
+            });
+        });
+    </script>
+</body>
+</html>
